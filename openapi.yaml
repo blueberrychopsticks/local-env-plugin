@@ -62,6 +62,32 @@ paths:
       responses:
         "200":
           description: OK
+  /execute-command:
+    post:
+      operationId: executeCommand
+      summary: Execute a terminal command
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+                  description: The terminal command to execute.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  output:
+                    type: string
+                    description: The output of the executed command.
+
 
 components:
   schemas:
@@ -91,3 +117,11 @@ components:
           type: integer
           description: The index of the todo to delete.
           required: true
+    executeCommandRequest:
+      type: object
+      required:
+      - command
+      properties:
+        command:
+          type: string
+          description: The terminal command to execute.

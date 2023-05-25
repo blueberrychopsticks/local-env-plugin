@@ -3,6 +3,7 @@ import json
 import quart
 import quart_cors
 from quart import request
+import subprocess
 
 app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.com")
 
@@ -48,6 +49,18 @@ async def openapi_spec():
     with open("openapi.yaml") as f:
         text = f.read()
         return quart.Response(text, mimetype="text/yaml")
+
+
+@app.post("/execute-command")
+async def execute_command():
+    request_data = await quart.request.get_json(force=True)
+    command = request_data["command"]
+    try:
+        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+        return quart.Response(response=json.dumps({"output": output.decode()}), status=200)
+    except subprocess.CalledProcessError as e:
+        return quart.Response(response=json.dumps({"error": str(e)}), status=400)
+
 
 def main():
     app.run(debug=True, host="0.0.0.0", port=5003)
